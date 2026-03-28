@@ -1,146 +1,307 @@
-/* --- 1. 全体の設定 --- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* --- 0. 変数とリセット --- */
+:root {
+  --bg-color: #000005;
+  --text-color: #ffffff;
+  --neon-pink: #ff00de;
+  --neon-blue: #00d2ff;
+  --neon-gold: #ffb300;
+  --neon-red: #ff0000;
+  --glitch-time: 0.3s;
+  --card-time: 0.6s;
+  --domain-time: 0.5s;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  /* サイバーなダーク背景（グラデーション） */
-  background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
-  color: #ffffff;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-  text-align: center;
-  /* 画面中央に配置 */
+  overflow-x: hidden;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  overflow-x: hidden;
-  padding: 20px;
+  /* 3D空間の奥行きを設定 */
+  perspective: 2000px;
 }
 
-.main-container {
-  max-width: 700px;
+/* --- 1. 背景：3Dパーティクル空間 --- */
+.space-background {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.space-background span {
+  position: absolute;
+  display: block;
+  width: 20px; height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: moveParticles 20s linear infinite;
+  /* 3D空間に配置 */
+  transform-style: preserve-3d;
+}
+
+/* ランダムな配置とアニメーション遅延（10個分） */
+.space-background span:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; transform: translateZ(-500px); }
+.space-background span:nth-child(2) { top: 30%; left: 80%; animation-delay: -2s; transform: translateZ(-200px); }
+.space-background span:nth-child(3) { top: 70%; left: 30%; animation-delay: -4s; transform: translateZ(-800px); }
+.space-background span:nth-child(4) { top: 90%; left: 90%; animation-delay: -6s; transform: translateZ(-100px); }
+.space-background span:nth-child(5) { top: 50%; left: 50%; animation-delay: -8s; transform: translateZ(-1000px); }
+.space-background span:nth-child(6) { top: 20%; left: 60%; animation-delay: -10s; transform: translateZ(-300px); }
+.space-background span:nth-child(7) { top: 80%; left: 20%; animation-delay: -12s; transform: translateZ(-600px); }
+.space-background span:nth-child(8) { top: 40%; left: 40%; animation-delay: -14s; transform: translateZ(-900px); }
+.space-background span:nth-child(9) { top: 60%; left: 70%; animation-delay: -16s; transform: translateZ(-400px); }
+.space-background span:nth-child(10) { top: 5%; left: 85%; animation-delay: -18s; transform: translateZ(-700px); }
+
+@keyframes moveParticles {
+  0% { transform: translateZ(-1000px) translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateZ(500px) translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+/* --- 2. メインビューポート --- */
+.main-viewport {
   width: 100%;
+  max-width: 800px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* --- 2. タイトルのネオンアニメーション --- */
-.neon-title {
-  font-size: 3rem;
-  font-weight: bold;
-  /* 文字グラデーション */
-  background: linear-gradient(90deg, #ff00de, #00d2ff, #ff00de);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  color: transparent;
-  /* アニメーション（グラデーション移動 & 脈動） */
-  animation: gradientShift 3s linear infinite, neonPulse 1.5s ease-in-out infinite alternate;
-  margin-bottom: 50px;
+/* --- 3. タイトル：グリッチエフェクト --- */
+.glitch-wrapper { margin-bottom: 60px; }
+
+.glitch-text {
+  font-size: 3.5rem;
+  font-weight: 900;
+  position: relative;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0.05em 0 0 var(--neon-pink), -0.05em -0.025em 0 var(--neon-blue),
+               -0.025em 0.05em 0 var(--neon-gold);
+  animation: glitchText 1s infinite;
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes neonPulse {
-  from {
-    text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 30px #ff00de;
-  }
-  to {
-    text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 15px #ff00de;
-  }
-}
-
-/* --- 3. プロフィールセクション --- */
-.profile-card {
-  margin-bottom: 40px;
+.glitch-text::before, .glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
   opacity: 0.8;
 }
 
-.profile-card p {
-  margin-bottom: 15px;
+.glitch-text::before {
+  animation: glitchLayers var(--glitch-time) infinite;
+  color: var(--neon-pink);
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  transform: translate(-0.025em, -0.0125em);
 }
 
-.name {
-  font-size: 1.8rem;
-  font-weight: bold;
-  letter-spacing: 2px;
+.glitch-text::after {
+  animation: glitchLayers var(--glitch-time) infinite reverse;
+  color: var(--neon-blue);
+  z-index: -2;
+  clip-path: polygon(0 80%, 100% 80%, 100% 100%, 0 100%);
+  transform: translate(0.025em, 0.0125em);
 }
 
-.alias {
-  font-style: italic;
-  color: #aaa;
-  font-size: 1rem;
+@keyframes glitchText {
+  0% { text-shadow: 0.05em 0 0 var(--neon-pink), -0.05em -0.025em 0 var(--neon-blue), -0.025em 0.05em 0 var(--neon-gold); }
+  14% { text-shadow: 0.05em 0 0 var(--neon-pink), -0.05em -0.025em 0 var(--neon-blue), -0.025em 0.05em 0 var(--neon-gold); }
+  15% { text-shadow: -0.05em -0.025em 0 var(--neon-pink), 0.025em 0.025em 0 var(--neon-blue), -0.05em -0.05em 0 var(--neon-gold); }
+  49% { text-shadow: -0.05em -0.025em 0 var(--neon-pink), 0.025em 0.025em 0 var(--neon-blue), -0.05em -0.05em 0 var(--neon-gold); }
+  50% { text-shadow: 0.025em 0.05em 0 var(--neon-pink), 0.05em 0 0 var(--neon-blue), 0.05em -0.025em 0 var(--neon-gold); }
+  99% { text-shadow: 0.025em 0.05em 0 var(--neon-pink), 0.05em 0 0 var(--neon-blue), 0.05em -0.025em 0 var(--neon-gold); }
+  100% { text-shadow: -0.025em 0 0 var(--neon-pink), -0.025em -0.025em 0 var(--neon-blue), -0.025em -0.05em 0 var(--neon-gold); }
 }
 
-.greeting {
-  color: gold;
-  font-size: 1.2rem;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+@keyframes glitchLayers {
+  0% { clip-path: polygon(0 15%, 100% 15%, 100% 30%, 0 30%); transform: translate(-5px, -3px); }
+  20% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(5px, 3px); }
+  40% { clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); transform: translate(-5px, 3px); }
+  60% { clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); transform: translate(5px, -3px); }
+  80% { clip-path: polygon(0 50%, 100% 50%, 100% 70%, 0 70%); transform: translate(-5px, -3px); }
+  100% { clip-path: polygon(0 15%, 100% 15%, 100% 30%, 0 30%); transform: translate(5px, 3px); }
 }
 
-/* --- 4. んん〜まか：ホバーエフェクト --- */
-.maka-voice {
-  font-size: 1.3rem;
-  margin-bottom: 50px;
-  display: inline-block;
-  transition: transform 0.3s ease, color 0.3s ease;
+/* --- 4. 3Dカードセクション --- */
+.card-3d-container {
+  width: 300px; height: 180px;
+  margin-bottom: 80px;
+  perspective: 1000px;
+}
+
+.card-3d {
+  width: 100%; height: 100%;
+  position: relative;
+  transition: transform var(--card-time);
+  transform-style: preserve-3d;
   cursor: pointer;
 }
 
-.maka-voice:hover {
-  /* ホバーすると少しデカくなって傾く、緑になる */
-  transform: scale(1.1) rotate(5deg);
-  color: #adff2f;
+.card-3d-container:hover .card-3d {
+  transform: rotateY(180deg) rotateX(10deg);
 }
 
-/* --- 5. 三大将セクション：サイバーエフェクト --- */
-.daishogo-section {
-  border: 2px solid cyan;
-  padding: 30px;
+.card-front, .card-back {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
   border-radius: 15px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  backface-visibility: hidden;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card-front .shine {
+  position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: skewX(-30deg);
+  transition: left var(--card-time);
+}
+
+.card-3d-container:hover .shine { left: 150%; }
+
+.name { font-size: 2rem; font-weight: bold; margin-bottom: 10px; }
+.alias { color: #aaa; font-size: 1.1rem; font-style: italic; }
+
+.card-back {
+  background: linear-gradient(135deg, var(--neon-pink) 0%, #330033 100%);
+  transform: rotateY(180deg);
+  border: 1px solid var(--neon-pink);
+}
+
+.greeting { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px #fff; }
+
+/* --- 5. んん〜まか：世界を揺らすインパクト --- */
+.impact-voice-wrapper {
+  margin-bottom: 100px;
   position: relative;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
 
-.daishogo-section:hover {
-  /* ホバーすると枠が消えて背景がサイバーに光る */
-  border-color: transparent;
-  box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
-  background-color: rgba(0, 255, 255, 0.05);
+.impact-voice {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--neon-gold);
+  text-shadow: 0 0 10px var(--neon-gold);
+  animation: shakeWorld 0.5s infinite;
+  cursor: crosshair;
 }
 
-.emoji-container {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 25px;
+@keyframes shakeWorld {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 2px); }
+  50% { transform: translate(2px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(2px, 2px); }
+}
+
+.shockwave {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  border: 2px solid var(--neon-gold);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+
+.impact-voice-wrapper:hover .shockwave {
+  animation: shockwavePulse 1s ease-out infinite;
+}
+
+@keyframes shockwavePulse {
+  0% { width: 0; height: 0; opacity: 1; }
+  100% { width: 300px; height: 300px; opacity: 0; }
+}
+
+/* --- 6. 三大将セクション：絶対領域展開 --- */
+.daishogo-domain-wrapper {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.domain-title {
+  font-size: 2.5rem;
+  color: var(--neon-red);
+  text-shadow: 0 0 20px var(--neon-red), 0 0 40px var(--neon-red);
+  margin-bottom: 30px;
+  animation: firePulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes firePulse {
+  from { text-shadow: 0 0 20px var(--neon-red), 0 0 40px var(--neon-red); }
+  to { text-shadow: 0 0 30px var(--neon-red), 0 0 60px var(--neon-red), 0 0 80px var(--neon-red); }
+}
+
+.daishogo-domain {
+  position: relative;
+  padding: 60px;
+  border-radius: 20px;
+  perspective: 1000px;
+  overflow: hidden;
+  transition: box-shadow var(--domain-time);
+}
+
+.daishogo-domain .domain-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 0, 0, 0.05);
+  z-index: -2;
+}
+
+.daishogo-domain .domain-border {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  border: 4px solid var(--neon-red);
+  border-radius: 20px;
+  z-index: -1;
+  transition: all var(--domain-time);
+}
+
+/* ホバー時の「領域展開」 */
+.daishogo-domain-wrapper:hover .daishogo-domain {
+  box-shadow: 0 0 100px rgba(255, 0, 0, 0.5);
+}
+
+.daishogo-domain-wrapper:hover .domain-border {
+  transform: rotateX(20deg) rotateY(10deg);
+  box-shadow: 0 0 30px var(--neon-red);
+}
+
+.emoji-3d-space {
+  font-size: 4rem;
+  display: flex; gap: 30px; margin-bottom: 30px;
+  transform-style: preserve-3d;
+  transition: transform var(--domain-time);
+}
+
+.daishogo-domain-wrapper:hover .emoji-3d-space {
+  transform: translateZ(50px) rotateY(360deg);
 }
 
 .emoji {
   display: inline-block;
   transition: transform 0.3s ease;
+  backface-visibility: hidden;
 }
 
-/* ホバー時にそれぞれ異なる動き */
-.emoji.drg:hover { transform: translateY(-15px) rotate(15deg); }
-.emoji.cow:hover { transform: translateY(-15px) rotate(-15deg); }
-.emoji.pig:hover { transform: translateY(-15px) scale(1.2); }
+.quote { font-size: 1.4rem; color: #fff; font-weight: bold; }
 
-.quote {
-  font-size: 1.2rem;
-  color: magenta;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
-}
-
-/* --- 6. レスポンシブ対応（スマホ対応） --- */
+/* レスポンシブ対応 */
 @media (max-width: 600px) {
-  .neon-title { font-size: 2rem; }
-  .name { font-size: 1.4rem; }
-  .emoji-container { font-size: 2rem; gap: 15px; }
+  .glitch-text { font-size: 2rem; }
+  .card-3d-container { width: 260px; height: 160px; }
+  .name { font-size: 1.6rem; }
+  .emoji-3d-space { font-size: 2.5rem; gap: 15px; }
+  .daishogo-domain { padding: 30px; }
 }
