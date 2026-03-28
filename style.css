@@ -1,16 +1,30 @@
-/* 「三大将」の行だけ特別にする */
-.daishogo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ff0000;           /* 赤色 */
-  border: 2px solid gold;   /* 金色の枠線 */
-  display: inline-block;    /* 枠線を文字の幅に合わせる */
-  padding: 10px 20px;       /* 枠の内側に余白を作る */
-  margin-top: 20px;         /* 上に隙間を作る */
+/* 全体の設定 */
+body {
+  background-color: #000000; /* 背景を黒に */
+  color: #ffffff;           /* 文字を白に */
+  font-family: sans-serif;   /* フォントをゴシック体に */
+  text-align: center;       /* 中央揃え */
+  padding-top: 50px;         /* 上に少し余白 */
 }
 
-/* 「んん〜まか...」の行を揺らす（おまけ） */
-.yantake {
-  color: #00ff00;           /* 蛍光グリーン */
-  font-style: italic;       /* 斜体 */
+/* 「マジで感謝」を金色で目立たせる */
+.thanks {
+  color: gold;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* 「んん〜まか...」を緑色にする */
+.voice {
+  color: #00ff00;
+  font-style: italic;
+}
+
+/* 「三大将」に赤い枠線をつける */
+.three-generals {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px;
+  border: 3px solid red;
+  font-size: 1.5rem;
 }
